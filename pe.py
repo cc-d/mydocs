@@ -5,7 +5,14 @@ from typing import List, Tuple
 from myutils import boxprint, CD, D, Decimal
 
 def strtuple(dp, dpr, pc):
-    return f'${dp} ${dpr} {pc}%'
+    if pc < 0:
+        sp = '-'
+        spc = sp + str(pc * 100)[1:]
+    else:
+        sp = ' '
+        spc = sp + str(pc * 100)
+
+    return f'${dp} {dpr} {spc}%'
 
 def stock_pe(price: Decimal, eps: Decimal, n: int) -> List[Tuple[Decimal, Decimal, Decimal]]:
     annual_eps = eps * D('4')
@@ -33,10 +40,10 @@ def stock_pe(price: Decimal, eps: Decimal, n: int) -> List[Tuple[Decimal, Decima
         result.append(
             (decreased_price, decreased_pe_ratio, D('-1') * percent_change))
 
-    return result
+    return list(reversed(sorted(result)))
 
 if __name__ == '__main__':
-    n = 25
+    n = 50
     for i in range(len(sys.argv)):
         if i == 0: continue
         if i == 1: price = CD(sys.argv[1])
@@ -45,7 +52,7 @@ if __name__ == '__main__':
 
     pes = stock_pe(price, eps, n)
 
-    pes = [f'${x[0]} ${x[1]} {x[2]}%' for x in pes]
+    pes = [strtuple(*(x)) for x in pes]
 
     boxprint(pes, title=f'${price} ${eps} {n}')
 
