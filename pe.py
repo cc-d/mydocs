@@ -16,13 +16,15 @@ def strtuple(dp, dpr, pc):
 
 def stock_pe(price: Decimal, eps: Decimal, n: int) -> List[Tuple[Decimal, Decimal, Decimal]]:
     annual_eps = eps * D('4')
-    pe_ratio = price / annual_eps
+    pe_ratio = D(price / annual_eps)
+    pe_ratio = Decimal(str(pe_ratio)).quantize(Decimal('0.0001'))
     result: List[Tuple[Decimal, Decimal, Decimal]] = []
     percent_step = D('0.0025')
 
     longest = 0
+    title = 'PE'
 
-    for i in range(1, n + 1):
+    for i in range(0, n + 1):
         # Calculate percent change
         percent_change = D(i * percent_step)
 
@@ -37,10 +39,14 @@ def stock_pe(price: Decimal, eps: Decimal, n: int) -> List[Tuple[Decimal, Decima
         # Add the tuples to the result list
         result.append(
             (increased_price, increased_pe_ratio, percent_change))
-        result.append(
-            (decreased_price, decreased_pe_ratio, D('-1') * percent_change))
 
-    return list(reversed(sorted(result)))
+        if percent_change != D(0):
+            result.append(
+                (decreased_price, decreased_pe_ratio, D('-1') * percent_change))
+        else:
+            title = f'${price} {pe_ratio}'
+
+    return list(reversed(sorted(result))), title
 
 if __name__ == '__main__':
     n = 50
@@ -50,9 +56,10 @@ if __name__ == '__main__':
         if i == 2: eps = CD(sys.argv[2])
         if i == 3: n = int(sys.argv[3])
 
-    pes = stock_pe(price, eps, n)
+    pes, title = stock_pe(price, eps, n)
 
     pes = [strtuple(*(x)) for x in pes]
 
-    boxprint(pes, title=f'${price} ${eps} {n}')
+
+    boxprint(pes, title=title)
 

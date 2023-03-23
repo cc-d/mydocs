@@ -29,6 +29,7 @@ def generate_prices(
     half_n = n // 2
     prices = []
 
+    prices.append(f"${stock_price} 0.00%")
     for i in range(-half_n, half_n + 1):
         if n % 2 == 0 and i == 0:
             continue
