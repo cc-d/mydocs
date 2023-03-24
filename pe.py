@@ -7,10 +7,10 @@ from myutils import boxprint, CD, D, Decimal
 def strtuple(dp, dpr, pc):
     if pc < 0:
         sp = '-'
-        spc = sp + str(pc * 100)[1:]
+        spc = sp + str(D(str(pc * 100)[1:]).quantize(D('0.01')))
     else:
         sp = ' '
-        spc = sp + str(pc * 100)
+        spc = sp + str(D(str(pc * 100)).quantize(D('0.01')))
 
     return f'${dp} {dpr} {spc}%'
 

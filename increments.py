@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 import sys
 from decimal import Decimal as D
 from typing import List, Tuple
@@ -30,8 +31,11 @@ def generate_prices(
     prices = []
 
     inc1percent = CD(price * D('0.01'))
+    price0 = f"${price} 0.00%"
+    prices.append(price0)
 
-    prices.append(f"${price}  0.00%")
+    maxlen = len(price0)
+
     for i in range(-half_n, half_n + 1):
         if n % 2 == 0 and i == 0:
             continue
@@ -39,21 +43,32 @@ def generate_prices(
         new_price = price + curinc
 
 
-        if i == abs(i):
-            formatted_price = f"${new_price}  {curinc}%"
-        else:
-            formatted_price = f"${new_price} {curinc}%"
+        formatted_price = f"${new_price} {curinc}%"
 
         prices.append(formatted_price)
 
-    title = f'${increment}  {incperc}%  |  ${inc1percent}  1.00%'
+        if len(formatted_price) > maxlen:
+            maxlen = len(formatted_price)
 
-    return list(
+    title = f'${start_price} | ${increment} {incperc}% | ${inc1percent} 1.00%' 
+
+    reg = r'\$(\d+?\.\d+)\s+(-?\d+?\.?\d+)%'
+
+    for si in range(len(prices)):
+        s = prices[si]
+        sdiff = (maxlen - len(s)) + 1
+        pri, per = re.match(reg, s).groups()
+        sp = (maxlen - (len(s) - 2)) * ' '
+
+        prices[si] = f'{pri}{sp}{per}%'
+
+    return [f'${x}' for x in list(
         reversed(
             sorted(
                 prices, 
-                key=lambda x: D(str(x.split(' ')[0])[1:])))
-    ), title
+                key=lambda x: Decimal(x.split(' ')[0]))
+        )
+    )], title
 
 
 def main():

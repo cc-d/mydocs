@@ -20,7 +20,7 @@ def boxprint(strings: List[str], title: Optional[str] = None) -> None:
     terminal_width, _ = shutil.get_terminal_size()
 
     # Determine column width and number of rows
-    max_length = max(len(s) for s in strings + [title])
+    max_length = max(*(len(s) for s in strings), len(title) - (len(title) // 3) )
     # 4 for column padding and separators
     num_columns = max(1, terminal_width // (max_length + 4))
     column_width = (terminal_width - num_columns - 1) // num_columns
