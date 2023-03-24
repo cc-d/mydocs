@@ -9,7 +9,8 @@ def D(num) -> Decimal:
 
 
 def CD(num) -> Decimal:
-    return D(str(num)).quantize(D(0.01), rounding=ROUND_HALF_UP)
+    return D(
+        str(num)).quantize(D('0.01'), rounding=ROUND_HALF_UP)
 
 
 
