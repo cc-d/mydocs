@@ -4,29 +4,31 @@ import sys
 from decimal import Decimal as D
 from typing import List, Tuple
 
-from myutils import *
+from utils import boxprint, CD, D, Decimal
+
+
+class _DEFAULT:
+    price = D('100')
+    incperc = D('0.25')
+    n = 100
 
 
 def generate_prices(
-    price: str, 
-    incperc: D = D('0.25'),
-    n: int = 100
+    price: str, incperc: D = D('0.25'), n: int = 100
 ) -> Tuple[List[str], D]:
-    """
-    Generates a list of prices based on a starting stock price, an increment percentage, and the number of prices to generate.
-    
+    """Generates a list of prices and their percent change from the original
+    price.
     Args:
-    - price: The starting stock price, as a string.
-    - incperc: The percentage increment to apply to each price. Default is 0.25
-    - n: The number of prices to generate. Default is 10.
-    
+        price: The original price.
+        incperc: The percent change of each price.
+        n: The number of prices to generate.
     Returns:
-    - A tuple containing a list of formatted prices as strings and the price increment as a Decimal.
+        A tuple containing a list of prices and the title of the box.
     """
     price, incperc = CD(price), D(str(incperc))
     start_price = D(str(price))
 
-    increment = CD(price * incperc / 100)
+    increment = CD(price * (incperc / 100))
     half_n = n // 2
     prices = []
 
@@ -42,7 +44,6 @@ def generate_prices(
         curinc = i * increment
         new_price = price + curinc
 
-
         formatted_price = f"${new_price} {curinc}%"
 
         prices.append(formatted_price)
@@ -50,7 +51,7 @@ def generate_prices(
         if len(formatted_price) > maxlen:
             maxlen = len(formatted_price)
 
-    title = f'${start_price} | ${increment} {incperc}% | ${inc1percent} 1.00%' 
+    title = f'${start_price} | ${increment} {incperc * 100}%'
 
     reg = r'\$(\d+?\.\d+)\s+(-?\d+?\.?\d+)%'
 
@@ -62,26 +63,38 @@ def generate_prices(
 
         prices[si] = f'{pri}{sp}{per}%'
 
-    return [f'${x}' for x in list(
-        reversed(
-            sorted(
-                prices, 
-                key=lambda x: Decimal(x.split(' ')[0]))
+    return [
+        f'${x}'
+        for x in list(
+            reversed(sorted(prices, key=lambda x: Decimal(x.split(' ')[0])))
         )
-    )], title
+    ], title
+
+
+def help():
+    print('Usage: increments.py [price] [increment] [n]')
+    sys.exit(0)
 
 
 def main():
-    funcargs = []
+    price, incperc, n = _DEFAULT.price, _DEFAULT.incperc, _DEFAULT.n
     for i in range(len(sys.argv)):
+        if i == 0:
+            continue
         if i == 1:
-            funcargs.append(D(sys.argv[i]))
-        elif i == 2:
-            funcargs.append(D(sys.argv[i]))
-        elif i == 3:
-            funcargs.append(int(sys.argv[i]))
-    
-    prices, title = generate_prices(*(x for x in funcargs))
+            if sys.argv[1].lower()[0] in ['h', '-']:
+                help()
+            price = sys.argv[1]
+        if i == 2:
+            incperc = sys.argv[2]
+        if i == 3:
+            n = int(sys.argv[3])
+
+    if isinstance(incperc, str) and incperc.find('%') != -1:
+        incperc = incperc[:-1]
+        incperc = D(str(incperc)) / D('100')
+
+    prices, title = generate_prices(price, incperc, n)
     boxprint(prices, title=title)
 
 

@@ -11,12 +11,13 @@ end_date = '2022-03-22'
 url = f'https://ycharts.com/companies/{symbol}/historical_data/{start_date}/{end_date}'
 
 # Define the user agent string to use
-user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+user_agent = (
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like'
+    ' Gecko) Chrome/58.0.3029.110 Safari/537.3'
+)
 
 # Define the headers to use in the request
-headers = {
-    'User-Agent': user_agent,
-}
+headers = {'User-Agent': user_agent}
 
 # Send a GET request to the URL with the custom headers
 response = requests.get(url, headers=headers)
